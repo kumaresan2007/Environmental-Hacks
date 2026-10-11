@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NeerWatch — Chennai Water Bodies Surveillance GIS Workspace</title>
+  <meta name="description" content="Civic GIS workspace for Tamil Nadu Water Resources Department and Chennai Metro Area (CMA) Cadastral surveillance, water body monitoring, and change alert management.">
+
+  <!-- Typography: Public Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Public+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- ======================================================================
+         Sidebar Navigation Shell
+         ====================================================================== -->
+    <aside class="sidebar" aria-label="Main Navigation">
+      <div class="sidebar-header">
+        <div class="brand-wrapper">
+          <div class="brand-emblem" title="NeerWatch Water Cadastre">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>NeerWatch</h1>
+            <div class="brand-sub">Chennai Metro Area</div>
+          </div>
+        </div>
+
+        <div class="gis-crs-indicator" title="Spatial Coordinate Reference System">
+          <span class="gis-dot"></span>
+          <span>EPSG:4326 • WGS 84 Cadastral</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Surveillance Workspace</div>
+
+        <a href="#dashboard" class="nav-link active" id="navDashboard">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </div>
+        </a>
+
+        <a href="#waterbodies" class="nav-link" id="navWaterBodies">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span>Water Bodies</span>
+          </div>
+        </a>
+
+        <a href="#alerts" class="nav-link" id="navAlerts">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Change Alerts</span>
+          </div>
+          <span class="nav-badge" id="navAlertsBadge">0</span>
+        </a>
+
+        <a href="#map" class="nav-link" id="navMap">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>GIS Map View</span>
+          </div>
+        </a>
+
+        <div class="nav-section-title" style="margin-top: 14px;">Data Operations</div>
+
+        <a href="#import" class="nav-link" id="navImport">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <span>Data Import</span>
+          </div>
+        </a>
+
+        <a href="#reports" class="nav-link" id="navReports">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            <span>Reports &amp; Exports</span>
+          </div>
+        </a>
+
+        <a href="#admin" class="nav-link" id="navAdmin">
+          <div class="nav-link-content">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Administration</span>
+          </div>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-card">
+          <div class="user-avatar" id="sidebarUserAvatar">KR</div>
+          <div class="user-details">
+            <div class="user-name" id="sidebarUserName">Dr. K. Ramanathan</div>
+            <div class="user-designation" id="sidebarUserDesignation">Principal Geospatial Director</div>
+          </div>
+          <button class="btn-signout" id="btnSignout" title="Sign Out of Session" aria-label="Sign Out">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ======================================================================
+         Main Layout Wrapper
+         ====================================================================== -->
+    <div class="main-wrapper">
+
+      <!-- Topbar Header -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="sidebar-toggle-btn" id="sidebarToggleBtn" aria-label="Toggle Navigation Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <div class="breadcrumb">
+            <span class="breadcrumb-item">CMA Cadastral GIS</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item">Tamil Nadu Water Resources</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-item breadcrumb-current" id="breadcrumbCurrent">Surveillance Dashboard</span>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="monitoring-cycle-tag" title="Active Satellite Monitoring Period">
+            <span>Cycle: NE Monsoon 2026-Q3</span>
+          </div>
+
+          <div class="connection-status" title="Live Local SQLite REST Link">
+            <span class="status-pulse"></span>
+            <span>Backend Connected</span>
+          </div>
+
+          <button class="btn-secondary" style="padding: 4px 8px; font-size: 11.5px;" id="btnOpenAccountModal" title="Switch between authenticated seed accounts">
+            <span id="topbarAccountName">Dr. K. Ramanathan</span>
+            <span class="role-badge role-admin" id="topbarRoleBadge">ADMIN</span>
+          </button>
+
+          <!-- Role Simulator (Visual Preview Only) -->
+          <div class="role-simulator-widget" title="Role simulator previews interface visibility only; backend permissions remain strictly enforced by server">
+            <span class="simulator-label">Role Simulator:</span>
+            <select class="role-select" id="roleSimulatorSelect" aria-label="Simulate UI Role View">
+              <option value="actual">Actual Session</option>
+              <option value="reviewer">Reviewer (UI Preview)</option>
+              <option value="viewer">Viewer (UI Preview)</option>
+              <option value="admin">Admin (UI Preview)</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <!-- Scrollable Main Content -->
+      <main class="page-content">
+
+        <!-- ==================================================================
+             SECTION 1: DASHBOARD
+             ================================================================== -->
+        <section id="secDashboard" class="app-section active-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Chennai Water Bodies Surveillance Dashboard
+            </h1>
+            <p class="section-description">
+              Real-time monitoring summary across Chennai Metro Area cadastral lakes, reservoirs, buffer zones, and satellite change alerts.
+            </p>
+          </div>
+
+          <!-- Real KPI Tiles -->
+          <div class="dashboard-grid">
+            <div class="kpi-card">
+              <span class="kpi-label">Monitored Water Bodies</span>
+              <span class="kpi-value" id="kpiWaterBodies">-</span>
+              <span class="kpi-sub">Cadastral lake polygons registered</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Total Cadastral Area</span>
+              <span class="kpi-value" id="kpiArea">-</span>
+              <span class="kpi-sub">Baseline water spread extent</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Active Change Alerts</span>
+              <span class="kpi-value" id="kpiActiveAlerts" style="color: var(--status-warning);">-</span>
+              <span class="kpi-sub">Encroachment &amp; contraction flags</span>
+            </div>
+            <div class="kpi-card">
+              <span class="kpi-label">Areas Under Review</span>
+              <span class="kpi-value" id="kpiAreasReview" style="color: var(--status-danger);">-</span>
+              <span class="kpi-sub">Priority inspection zones</span>
+            </div>
+          </div>
+
+          <!-- Split Grid: Priority Alerts & Activity -->
+          <div class="dashboard-split">
+            <div>
+              <!-- Priority Alerts Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <div class="panel-title-group">
+                    <h2 class="panel-title">Priority Alerts Requiring Verification</h2>
+                    <span class="panel-badge">Cycle 2026-Q3</span>
+                  </div>
+                  <a href="#alerts" onclick="window.location.hash='alerts'" class="btn-secondary btn-sm">View All Alerts</a>
+                </div>
+                <div class="table-wrapper">
+                  <table class="cma-table">
+                    <thead>
+                      <tr>
+                        <th>Record ID</th>
+                        <th>Water Body</th>
+                        <th>Severity</th>
+                        <th>Alert Type</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashPriorityAlertsBody">
+                      <!-- Rendered dynamically -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Quick Workflow Actions -->
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">Surveillance Actions</h2>
+                </div>
+                <div class="panel-body" style="display: flex; gap: 12px; flex-wrap: wrap;">
+                  <button class="btn-primary" onclick="window.location.hash='map'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/></svg>
+                    Explore GIS Spatial Map
+                  </button>
+                  <button class="btn-secondary" onclick="window.location.hash='import'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Ingest Spatial Dataset
+                  </button>
+                  <button class="btn-secondary" onclick="window.location.hash='reports'">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                    Export Cadastral Packages
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <!-- Zone Distribution Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">Zonal Extent Breakdown</h2>
+                  <span class="panel-badge">CMA Cadastre</span>
+                </div>
+                <div class="panel-body" id="dashZoneList" style="padding-top: 6px;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+
+              <!-- Recent Activity Feed -->
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">Recent Workspace Activity</h2>
+                </div>
+                <div id="dashActivityFeed" style="max-height: 280px; overflow-y: auto;">
+                  <!-- Rendered dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 2: WATER BODIES INVENTORY
+             ================================================================== -->
+        <section id="secWaterBodies" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              Chennai Metro Area Water Bodies Inventory
+            </h1>
+            <p class="section-description">
+              Search and filter registered reservoirs, lakes, eris, and urban tanks with official cadastral identifiers, areas, and alert statuses.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2 class="panel-title">Registered Cadastral Records</h2>
+                <span class="panel-badge" id="wbCountPill">Loading...</span>
+              </div>
+              <div class="panel-actions">
+                <button class="btn-secondary btn-sm" onclick="window.location.hash='import'">+ Ingest New Data</button>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <!-- Filter Toolbar -->
+              <div class="filter-toolbar">
+                <div class="search-input-wrapper">
+                  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" class="search-input" id="wbSearchInput" placeholder="Search by lake name, record ID, or zone..." aria-label="Search water bodies">
+                </div>
+
+                <div class="filter-group">
+                  <label for="wbZoneFilter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Zone:</label>
+                  <select class="filter-select" id="wbZoneFilter">
+                    <option value="All">All CMA Zones</option>
+                  </select>
+
+                  <label for="wbStatusFilter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-left: 6px;">Status:</label>
+                  <select class="filter-select" id="wbStatusFilter">
+                    <option value="All">All Statuses</option>
+                    <option value="Monitored">Nominal / Monitored</option>
+                    <option value="Under Review">Under Active Review</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Records Table -->
+              <div class="table-wrapper">
+                <table class="cma-table">
+                  <thead>
+                    <tr>
+                      <th>Record ID</th>
+                      <th>Water Body Name</th>
+                      <th>Cadastral Zone</th>
+                      <th>Area (Hectares)</th>
+                      <th>CRS</th>
+                      <th>Surveillance Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wbTableBody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+                <div id="wbTableState" style="display: none;"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 3: CHANGE ALERTS
+             ================================================================== -->
+        <section id="secAlerts" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Satellite Change Surveillance Alerts
+            </h1>
+            <p class="section-description">
+              Inspect surface area contractions, buffer zone encroachments, and bund boundary anomalies. Review alerts, record notes, and update statuses.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2 class="panel-title">Active Alert Feed</h2>
+                <span class="panel-badge" id="alertsCountPill">Loading...</span>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <!-- Filter Toolbar -->
+              <div class="filter-toolbar">
+                <div class="search-input-wrapper">
+                  <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  <input type="text" class="search-input" id="alertSearchInput" placeholder="Filter alerts by waterbody or alert type..." aria-label="Search alerts">
+                </div>
+
+                <div class="filter-group">
+                  <label for="alertSeverityFilter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Severity:</label>
+                  <select class="filter-select" id="alertSeverityFilter">
+                    <option value="All">All Severities</option>
+                    <option value="High">High Severity</option>
+                    <option value="Medium">Medium Severity</option>
+                    <option value="Low">Low Severity</option>
+                  </select>
+
+                  <label for="alertStatusFilter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Status:</label>
+                  <select class="filter-select" id="alertStatusFilter">
+                    <option value="All">All Statuses</option>
+                    <option value="Open Review">Open Review</option>
+                    <option value="In Verification">In Verification</option>
+                    <option value="Action Recommended">Action Recommended</option>
+                    <option value="Resolved">Resolved</option>
+                  </select>
+
+                  <label for="alertZoneFilter" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Zone:</label>
+                  <select class="filter-select" id="alertZoneFilter">
+                    <option value="All">All Zones</option>
+                  </select>
+
+                  <label for="alertSortSelect" style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Sort:</label>
+                  <select class="filter-select" id="alertSortSelect">
+                    <option value="date_desc">Newest First</option>
+                    <option value="date_asc">Oldest First</option>
+                    <option value="severity_desc">Severity (High &rarr; Low)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Alerts Grid -->
+              <div class="alerts-grid" id="alertsContainer">
+                <!-- Rendered dynamically -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 4: GIS MAP VIEW
+             ================================================================== -->
+        <section id="secMap" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              GIS Spatial Cadastral Map Viewer
+            </h1>
+            <p class="section-description">
+              Spatial vector visualization of Chennai Metro Area water body boundaries in WGS 84 (EPSG:4326) with change alert coordinates and layer controls.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2 class="panel-title">Chennai Metro Spatial Canvas</h2>
+                <span class="panel-badge">EPSG:4326 Real Geometry</span>
+              </div>
+              <div class="panel-actions">
+                <select class="filter-select" id="mapWaterbodySelect" aria-label="Jump to Water Body">
+                  <option value="">Jump to Water Body...</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="panel-body" style="padding: 0;">
+              <div class="gis-map-viewport">
+                <canvas id="mapCanvas"></canvas>
+
+                <!-- Map Overlay Controls -->
+                <div class="map-controls-overlay">
+                  <div style="font-weight: 700; text-transform: uppercase; font-size: 10px; color: var(--text-muted); margin-bottom: 2px;">Map Tools</div>
+                  <div style="display: flex; gap: 4px;">
+                    <button class="btn-secondary btn-sm" id="btnMapZoomIn" title="Zoom in">+</button>
+                    <button class="btn-secondary btn-sm" id="btnMapZoomOut" title="Zoom out">-</button>
+                    <button class="btn-secondary btn-sm" id="btnMapReset" title="Reset view">Reset</button>
+                  </div>
+                  <label style="display: flex; align-items: center; gap: 6px; margin-top: 4px; cursor: pointer;">
+                    <input type="checkbox" id="mapTogglePolygons" checked> Water Polygons
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" id="mapToggleAlerts" checked> Alert Pins
+                  </label>
+                </div>
+
+                <!-- Map Legend -->
+                <div class="map-legend-overlay">
+                  <div style="font-weight: 700; font-size: 10.5px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 2px;">GIS Legend</div>
+                  <div class="legend-item">
+                    <span class="legend-color-box" style="background: rgba(40, 160, 145, 0.5); border-color: #0D5C58;"></span>
+                    <span>Monitored Water Body</span>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-color-box" style="background: rgba(230, 140, 40, 0.5); border-color: #B86A14;"></span>
+                    <span>Lake with Active Alert</span>
+                  </div>
+                  <div class="legend-item">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #C42B1C; border: 1px solid #FFF;"></span>
+                    <span>High Severity Alert</span>
+                  </div>
+                  <div class="legend-item">
+                    <span style="display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #996500; border: 1px solid #FFF;"></span>
+                    <span>Medium Severity Alert</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 5: DATA IMPORT
+             ================================================================== -->
+        <section id="secImport" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Spatial Cadastral Data Ingestion
+            </h1>
+            <p class="section-description">
+              Upload GeoJSON or CSV survey files. Validates Coordinate Reference System (WGS 84), geometry schemas, and property aliases prior to commitment.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title-group">
+                <h2 class="panel-title">Upload &amp; Validation Engine</h2>
+                <span class="panel-badge">Reviewer &amp; Admin Authority</span>
+              </div>
+            </div>
+
+            <div class="panel-body">
+              <div class="dropzone-container" id="spatialDropzone" role="button" tabindex="0" aria-label="Drop spatial files to validate and import">
+                <svg class="dropzone-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+                <div class="dropzone-title">Drag &amp; Drop Cadastral File Here</div>
+                <div class="dropzone-sub">or click to browse local files</div>
+                <div class="dropzone-formats">
+                  <span class="format-pill">GeoJSON (.geojson)</span>
+                  <span class="format-pill">JSON (.json)</span>
+                  <span class="format-pill">CSV (.csv)</span>
+                </div>
+
+                <input type="file" id="spatialFileInput" accept=".geojson,.json,.csv" style="display: none;">
+
+                <div class="sample-loaders">
+                  <span style="font-size: 11px; color: var(--text-muted);">Test files:</span>
+                  <button type="button" class="btn-sample" id="btnSampleGeojson">Load Sample GeoJSON</button>
+                  <button type="button" class="btn-sample" id="btnSampleCsv">Load Sample CSV</button>
+                </div>
+              </div>
+
+              <div id="ingestPreviewContainer"></div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 6: REPORTS & EXPORTS
+             ================================================================== -->
+        <section id="secReports" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              Cadastral Reports &amp; Spatial Exports
+            </h1>
+            <p class="section-description">
+              Generate certified spatial exports for GIS software (QGIS, ArcGIS) and printable executive surveillance digests for the Tamil Nadu Water Resources Department.
+            </p>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <h2 class="panel-title">Export Dataset Package Selection</h2>
+            </div>
+
+            <div class="panel-body">
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-bottom: 20px;">
+                <div>
+                  <label for="reportCycleSelect" style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Surveillance Cycle:</label>
+                  <select class="filter-select" id="reportCycleSelect" style="width: 100%;">
+                    <option value="NE Monsoon 2026-Q3">Current Cycle: NE Monsoon 2026-Q3</option>
+                    <option value="SW Monsoon 2026-Q2">Previous Cycle: SW Monsoon 2026-Q2</option>
+                    <option value="Annual Archive 2026">Annual Cadastral Archive 2026</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="reportZoneSelect" style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px;">Zone Scope:</label>
+                  <select class="filter-select" id="reportZoneSelect" style="width: 100%;">
+                    <option value="All">All CMA Zones (Unfiltered)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="export-options-list">
+                <!-- Option 1: GeoJSON -->
+                <div class="export-option-card">
+                  <div class="export-option-info">
+                    <div class="export-icon-box">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </div>
+                    <div>
+                      <div class="export-option-title">Cadastral Water Bodies (GeoJSON)</div>
+                      <div class="export-option-desc">Complete polygon boundaries and area properties in WGS 84 (EPSG:4326).</div>
+                    </div>
+                  </div>
+                  <button class="btn-primary" id="btnExportGeojson">Download GeoJSON</button>
+                </div>
+
+                <!-- Option 2: Water Bodies CSV -->
+                <div class="export-option-card">
+                  <div class="export-option-info">
+                    <div class="export-icon-box">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+                    </div>
+                    <div>
+                      <div class="export-option-title">Water Bodies Cadastral Inventory (CSV)</div>
+                      <div class="export-option-desc">Tabular dataset containing record IDs, names, zones, and area extents.</div>
+                    </div>
+                  </div>
+                  <button class="btn-primary" id="btnExportWbCsv">Download CSV</button>
+                </div>
+
+                <!-- Option 3: Alerts CSV -->
+                <div class="export-option-card">
+                  <div class="export-option-info">
+                    <div class="export-icon-box">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+                    </div>
+                    <div>
+                      <div class="export-option-title">Change Surveillance Alerts (CSV)</div>
+                      <div class="export-option-desc">Encroachments, area contraction percentages, and recorded reviewer notes.</div>
+                    </div>
+                  </div>
+                  <button class="btn-primary" id="btnExportAlertsCsv">Download Alerts</button>
+                </div>
+
+                <!-- Option 4: Executive PDF Digest -->
+                <div class="export-option-card">
+                  <div class="export-option-info">
+                    <div class="export-icon-box">
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+                    </div>
+                    <div>
+                      <div class="export-option-title">Executive Cadastral Digest (Printable PDF)</div>
+                      <div class="export-option-desc">Official summary formatted for leadership review with cadastral metrics.</div>
+                    </div>
+                  </div>
+                  <button class="btn-primary" id="btnExportPdf">View Digest</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+
+        <!-- ==================================================================
+             SECTION 7: ADMINISTRATION
+             ================================================================== -->
+        <section id="secAdmin" class="app-section">
+          <div class="section-header">
+            <h1 class="section-title">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="color: var(--primary-teal);"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Administration &amp; Workspace Management
+            </h1>
+            <p class="section-description">
+              Manage personnel accounts, view immutable system audit logs, and inspect role permission policies.
+            </p>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px;">
+            <div>
+              <!-- Personnel Directory Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <div class="panel-title-group">
+                    <h2 class="panel-title">Personnel Directory</h2>
+                    <span class="panel-badge">Live Accounts</span>
+                  </div>
+                  <div class="panel-actions">
+                    <button class="btn-primary btn-sm" id="btnAddUser">+ Add Authorized User</button>
+                  </div>
+                </div>
+
+                <div class="panel-body">
+                  <div class="stats-grid" style="margin-bottom: 14px;">
+                    <div class="stat-card">
+                      <span class="stat-label">Total Users</span>
+                      <span class="stat-value" id="statTotal">-</span>
+                    </div>
+                    <div class="stat-card">
+                      <span class="stat-label">Admins</span>
+                      <span class="stat-value" id="statAdmins">-</span>
+                    </div>
+                    <div class="stat-card">
+                      <span class="stat-label">Reviewers</span>
+                      <span class="stat-value" id="statReviewers">-</span>
+                    </div>
+                    <div class="stat-card">
+                      <span class="stat-label">Viewers</span>
+                      <span class="stat-value" id="statViewers">-</span>
+                    </div>
+                  </div>
+
+                  <div class="search-input-wrapper" style="margin-bottom: 12px; max-width: 100%;">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    <input type="text" class="search-input" id="userSearchInput" placeholder="Filter personnel by name, email, or designation..." aria-label="Search personnel">
+                  </div>
+
+                  <div class="table-wrapper">
+                    <table class="cma-table">
+                      <thead>
+                        <tr>
+                          <th>Identity &amp; Designation</th>
+                          <th>Official Email</th>
+                          <th>Role</th>
+                          <th>Registered</th>
+                          <th>Status</th>
+                        </tr>
+                      </thead>
+                      <tbody id="usersTableBody">
+                        <!-- Rendered dynamically -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Role Authority Matrix Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">Role Authority &amp; Access Boundaries</h2>
+                </div>
+                <div class="panel-body" style="padding: 12px 18px;">
+                  <table class="cma-table" style="font-size: 11.5px;">
+                    <thead>
+                      <tr>
+                        <th>Workspace Capability</th>
+                        <th>Admin</th>
+                        <th>Reviewer</th>
+                        <th>Viewer</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>View Cadastre, Alerts, &amp; Map</td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                      </tr>
+                      <tr>
+                        <td>Export Cadastral Packages</td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                      </tr>
+                      <tr>
+                        <td>Review Alerts &amp; Record Notes</td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-danger); font-weight:700;">Restricted (403)</span></td>
+                      </tr>
+                      <tr>
+                        <td>Ingest &amp; Commit Spatial Datasets</td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-danger); font-weight:700;">Restricted (403)</span></td>
+                      </tr>
+                      <tr>
+                        <td>User Account Provisioning</td>
+                        <td><span style="color:var(--status-success); font-weight:700;">Granted</span></td>
+                        <td><span style="color:var(--status-danger); font-weight:700;">Restricted (403)</span></td>
+                        <td><span style="color:var(--status-danger); font-weight:700;">Restricted (403)</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <!-- Audit Log Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <div class="panel-title-group">
+                    <h2 class="panel-title">Authentication &amp; System Audit Log</h2>
+                    <span class="panel-badge">Immutable SQLite</span>
+                  </div>
+                </div>
+                <div class="panel-body" style="padding: 0;">
+                  <div id="auditListContainer" style="max-height: 420px; overflow-y: auto;">
+                    <!-- Rendered dynamically -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- Integration Status Panel -->
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">Integrations &amp; Compliance Status</h2>
+                </div>
+                <div class="panel-body">
+                  <div class="integration-list">
+                    <div class="integration-item">
+                      <span class="integration-name">Local SQLite ACID Datastore</span>
+                      <span class="badge-configured">Operational</span>
+                    </div>
+                    <div class="integration-item">
+                      <span class="integration-name">Server-Side Role Enforcement</span>
+                      <span class="badge-configured">Active (HTTP 401/403)</span>
+                    </div>
+                    <div class="integration-item">
+                      <span class="integration-name">Password Hashing (PBKDF2-SHA256)</span>
+                      <span class="badge-configured">Operational</span>
+                    </div>
+                    <div class="integration-item">
+                      <span class="integration-name">Active Session Lifetime (24h TTL)</span>
+                      <span class="badge-configured">Active</span>
+                    </div>
+                    <div class="integration-item">
+                      <span class="integration-name">LDAP / SSO Directory Sync</span>
+                      <span class="badge-unconfigured">Not configured</span>
+                    </div>
+                    <div class="integration-item">
+                      <span class="integration-name">Biometric Node Link</span>
+                      <span class="badge-unconfigured">Not configured</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+  </div>
+
+  <!-- ======================================================================
+       MODAL 1: Review Alert & Add Notes
+       ====================================================================== -->
+  <div class="modal-backdrop" id="reviewAlertModal" role="dialog" aria-modal="true" aria-labelledby="reviewAlertTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="reviewAlertTitle">Review Change Alert</h3>
+        <button class="modal-close-btn" id="btnCloseReviewAlert" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="reviewAlertForm">
+        <input type="hidden" id="reviewAlertId">
+        <div class="modal-body">
+          <div id="reviewAlertSummary"></div>
+
+          <div class="form-group">
+            <label class="form-label" for="reviewAlertStatus">Surveillance Verification Status <span class="req">*</span></label>
+            <select class="form-select" id="reviewAlertStatus" required>
+              <option value="Open Review">Open Review (Pending Assessment)</option>
+              <option value="In Verification">In Verification (Ground Inspection Dispatched)</option>
+              <option value="Action Recommended">Action Recommended (Encroachment Demarcation Required)</option>
+              <option value="Resolved">Resolved (Anomaly Verified &amp; Closed)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reviewAlertNotes">Reviewer Commentary &amp; Inspection Notes</label>
+            <textarea class="form-textarea" id="reviewAlertNotes" placeholder="Document ground inspection findings, GPS survey measurements, or boundary confirmation notes..."></textarea>
+          </div>
+
+          <div id="reviewRoleNotice" style="display: none; padding: 8px 10px; background: var(--status-warning-bg); border: 1px solid var(--status-warning-border); border-radius: 4px; font-size: 11.5px; margin-top: 10px;"></div>
+
+          <div id="reviewAlertHistory"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelReviewAlert">Close</button>
+          <button type="submit" class="btn-primary">Save Review &amp; Update Status</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 2: Water Body Record Details
+       ====================================================================== -->
+  <div class="modal-backdrop" id="recordDetailModal" role="dialog" aria-modal="true" aria-labelledby="recordDetailTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="recordDetailTitle">Water Body Cadastral Details</h3>
+        <button class="modal-close-btn" id="btnCloseRecordDetail" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body" id="recordDetailBody">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 3: Add New Workspace User
+       ====================================================================== -->
+  <div class="modal-backdrop" id="addUserModal" role="dialog" aria-modal="true" aria-labelledby="addUserModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="addUserModalTitle">Provision Authorized User</h3>
+        <button class="modal-close-btn" id="btnCloseAddUser" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="addUserForm">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="newUserName">Full Name <span class="req">*</span></label>
+            <input type="text" id="newUserName" class="form-input" placeholder="e.g. S. Jayakumar" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserEmail">Official Government Email <span class="req">*</span></label>
+            <input type="email" id="newUserEmail" class="form-input" placeholder="e.g. jayakumar.s@cma.tn.gov.in" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserRole">Assigned Role Authority <span class="req">*</span></label>
+            <select id="newUserRole" class="form-select" required>
+              <option value="viewer">Viewer (Read &amp; Export Permitted)</option>
+              <option value="reviewer">Reviewer (Alert Review &amp; Spatial Ingestion)</option>
+              <option value="admin">Admin (Full Workspace Management)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserDesignation">Designation / Cadastral Division</label>
+            <input type="text" id="newUserDesignation" class="form-input" placeholder="e.g. Assistant Hydrographer, Tambaram Zone">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newUserPassword">Temporary Password (min 8 characters) <span class="req">*</span></label>
+            <input type="password" id="newUserPassword" class="form-input" placeholder="Minimum 8 characters" minlength="8" required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelAddUser">Cancel</button>
+          <button type="submit" class="btn-primary">Create Authorized Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ======================================================================
+       MODAL 4: Switch Authenticated Session
+       ====================================================================== -->
+  <div class="modal-backdrop" id="switchAccountModal" role="dialog" aria-modal="true" aria-labelledby="switchModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="switchModalTitle">Switch Authenticated Session</h3>
+        <button class="modal-close-btn" id="btnCloseAccountModal" aria-label="Close dialog">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 12.5px; color: var(--text-secondary); margin-bottom: 14px;">
+          Select a verified user account to authenticate with the Python SQLite server. This changes the server session token and verifies real role-based permissions (Viewer vs Reviewer vs Admin).
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="switchUserSelect">Authorized Account</label>
+          <select id="switchUserSelect" class="form-select">
+            <option value="admin">Dr. K. Ramanathan (Admin • Principal Geospatial Director)</option>
+            <option value="reviewer">S. Priya (Reviewer • Senior Hydro-Cadastral Officer)</option>
+            <option value="viewer">M. Arun Kumar (Viewer • Disaster Management Analyst)</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" onclick="document.getElementById('switchAccountModal').classList.remove('active')">Cancel</button>
+        <button type="button" class="btn-primary" id="btnSubmitSwitchUser">Authenticate as Selected</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Application Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
