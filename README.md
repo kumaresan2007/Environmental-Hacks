@@ -79,7 +79,7 @@ NeerWatch provides 7 integrated workspace sections accessible via the left sideb
 
 3. **Change Surveillance Alerts (`#alerts`)**
    - Filter and sort by Severity (`High`, `Medium`, `Low`), Status (`Open Review`, `In Verification`, `Action Recommended`, `Resolved`), Zone, and Detection Date.
-   - Alert cards displaying satellite contraction percentage, detection dates, and reviewer commentary.
+   - Alert cards displaying satellite contraction percentage, detection dates, and reviewer commentary..
    - **Review Alert Modal**: Authorized Reviewers and Admins can update verification status and record inspection notes with an immutable audit trail.
 
 4. **GIS Spatial Map View (`#map`)**
